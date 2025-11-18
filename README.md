@@ -24,38 +24,25 @@ It provides intelligent medical assistance, symptom understanding, and health-re
 ☁️ Deployable frontend + backend
 
 🛠️ Tech Stack
-Frontend
 
+Frontend :-
 React (Vite/CRA)
-
 JavaScript / TypeScript (if used)
-
 Firebase Authentication
-
 Tailwind / CSS (optional)
 
-Backend
-
+Backend :-
 Python
-
 FastAPI
-
 PyTorch
-
 HuggingFace Transformers (LLM)
-
 Uvicorn
 
-Other Tools
-
+Other Tools :-
 Git & GitHub
-
 Firebase Console
-
 Virtual Environments (venv)
-
 REST APIs
-
 JSON Web Tokens (if used)
 
 📁 Project Structure (Recommended)
@@ -92,12 +79,9 @@ python -m venv venv
 Activate it
 
 Windows:
-
 venv\Scripts\activate
 
-
 Mac/Linux:
-
 source venv/bin/activate
 
 Install dependencies
@@ -105,7 +89,6 @@ pip install -r requirements.txt
 
 Run the FastAPI server
 uvicorn app:app --reload
-
 
 Backend will start at:
 👉 http://127.0.0.1:8000
@@ -115,19 +98,14 @@ cd client
 npm install
 npm run dev
 
-
 Frontend will start at:
 👉 http://localhost:3000
 
 🔥 4️⃣ Firebase Setup
-
-Go to Firebase Console
-
-Create a project
-
-Enable Email/Password Authentication
-
-Copy your config and place in client/src/firebase.js:
+1. Go to Firebase Console
+2. Create a project
+3. Enable Email/Password Authentication
+4. Copy your config and place in client/src/firebase.js:
 
 export const firebaseConfig = {
   apiKey: "",
@@ -140,13 +118,11 @@ export const firebaseConfig = {
 
 📡 API Endpoints (FastAPI)
 POST /chat
-
 Send a prompt to the LLM:
 
 {
   "message": "What are the symptoms of diabetes?"
 }
-
 
 Response:
 
@@ -155,59 +131,36 @@ Response:
 }
 
 GET /health
-
 Health check endpoint.
 
 🧠 Model Information
-
-Uses HuggingFace model (fill in actual model name)
-
-Loaded with PyTorch
-
-Optimized for inference
-
-Can run locally or on GPU servers
-
-🖼️ 📸 Screenshot Section
-
-(Add your images in /assets folder and link here)
-
-![Chat UI](assets/chat_ui.png)
-![Backend Running](assets/backend.png)
+- Uses HuggingFace model (fill in actual model name)
+- Loaded with PyTorch
+- Optimized for inference
+- Can run locally or on GPU servers
 
 🧪 Testing
 Test backend:
 curl -X POST http://127.0.0.1:8000/chat -H "Content-Type: application/json" -d "{\"message\":\"hello\"}"
 
 🚀 Deployment Guide
+
 Frontend deployment options
-
 Vercel
-
 Netlify
-
 Firebase Hosting
 
 Backend deployment options
-
 Render
-
 Railway
-
 AWS EC2
-
 Azure / Google Cloud
 
 🤝 Contributing
-
-Fork the repo
-
-Create a new branch
-
-Commit changes
-
-Open a Pull Request
+1. Fork the repo
+2. Create a new branch
+3. Commit changes
+4. Open a Pull Request
 
 📄 License
-
 This project is licensed under the MIT License.
