@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { signOut, onAuthStateChanged } from "firebase/auth";
 
 import userAvatar from '../assets/avatar.png';
 import botAvatar from '../assets/robo3.png';
@@ -17,38 +14,32 @@ export default function ChatPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setUserDetails({ name: "Not logged in", email: "-" });
-        return;
-      }
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserDetails({
-            name: docSnap.data().name || "No name",
-            email: user.email || ""
-          });
-        } else {
-          setUserDetails({ name: "Unknown user", email: user.email || "" });
-        }
-      } catch (error) {
-        setUserDetails({ name: "Error loading user", email: "" });
-      }
+    const userData = JSON.parse(localStorage.getItem("userDetails"));
+    setUserDetails({
+      name: userData?.name || "Not logged in",
+      email: userData?.email || "-"
     });
-    return () => unsubscribe();
+
+    const history = JSON.parse(localStorage.getItem("chatHistory"));
+    if (history && Array.isArray(history) && history.length > 0) {
+      setMessages(history);
+    }
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("chatHistory", JSON.stringify(messages));
+  }, [messages]);
+
   function handleLogout() {
-    signOut(auth).then(() => {
-      navigate("/login"); // update this route if needed
-    });
+    localStorage.removeItem("userDetails");
+    localStorage.removeItem("chatHistory");
+    navigate("/login");
   }
 
   async function sendMessage() {
     if (!input.trim()) return;
-    setMessages(msgs => [...msgs, { role: "user", content: input }]);
+    const newMessages = [...messages, { role: "user", content: input }];
+    setMessages(newMessages);
     setLoading(true);
 
     try {
@@ -71,40 +62,98 @@ export default function ChatPage() {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
       <div style={{
-        width: 220, background: "#f0f4fa", padding: "30px 24px", boxShadow: "0 0 4px #ddd", display: "flex", flexDirection: "column", alignItems: "center"
+        width: 220,
+        background: "#f0f4fa",
+        padding: "30px 24px",
+        boxShadow: "0 0 4px #ddd",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        position: "relative",
+        height: "100vh"
       }}>
         <img src={userAvatar} alt="User" style={{ width: 64, borderRadius: "50%", marginBottom: 15 }} />
         <div style={{ fontWeight: "bold", fontSize: 18, marginTop: 16 }}>{userDetails.name}</div>
         <div style={{ fontSize: 14, color: "#466", marginBottom: 30 }}>{userDetails.email}</div>
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "#fff",
-            color: "#d11a1a",
-            border: "1px solid #d11a1a",
-            borderRadius: 20,
-            padding: "8px 24px",
-            fontWeight: "bold",
-            fontSize: 16,
-            cursor: "pointer",
-            transition: "0.2s",
-            marginTop: "auto"
-          }}
-        >
-          Log Out
-        </button>
+
+        {/* Button group fixed at bottom */}
+        <div style={{
+          position: "absolute",
+          bottom: 40,
+          left: 0,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "16px"
+        }}>
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{
+              background: "#2976fd",
+              color: "#fff",
+              border: "none",
+              borderRadius: 20,
+              padding: "10px 24px",
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "pointer",
+              width: "82%",
+              marginBottom: 8,
+              boxShadow: "0 2px 9px #2976fd13",
+              letterSpacing: "0.5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "9px"
+            }}
+          >
+            <img src={botAvatar} alt="Dashboard" style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "#fff",
+              objectFit: "cover"
+            }} />
+            Dashboard
+          </button>
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "#fff",
+              color: "#d11a1a",
+              border: "1px solid #d11a1a",
+              borderRadius: 20,
+              padding: "10px 24px",
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "pointer",
+              width: "82%",
+              boxShadow: "0 2px 9px #d11a1a13",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "9px"
+            }}
+          >
+            <img src={botAvatar} alt="Logout" style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "#fff",
+              objectFit: "cover"
+            }} />
+            Log Out
+          </button>
+        </div>
       </div>
 
       {/* Chat Area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "32px 0 0 0" }}>
-        <h2 style={{textAlign: "center", color: "#2076fa", marginBottom: 12}}>Chat with MedBot</h2>
+        <h2 style={{ textAlign: "center", color: "#2076fa", marginBottom: 12 }}>Chat with MedBot</h2>
         <div style={{
-          flex: 1,
-          padding: "0 12px",
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 18
+          flex: 1, padding: "0 12px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 18
         }}>
           {messages.map((msg, idx) => {
             const isUser = msg.role === "user";
@@ -151,7 +200,7 @@ export default function ChatPage() {
           })}
 
           {loading && (
-            <div style={{textAlign: "center", marginTop: 18}}>
+            <div style={{ textAlign: "center", marginTop: 18 }}>
               <i>MedBot is thinking...</i>
             </div>
           )}
